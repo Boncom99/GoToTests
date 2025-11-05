@@ -1,0 +1,78 @@
+{
+  "activationEvents": ["onCommand:goToTests.open"],
+  "categories": ["Other"],
+  "contributes": {
+    "commands": [
+      {
+        "category": "Navigation",
+        "command": "goToTests.open",
+        "title": "Go to Tests"
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "goToTests.createIfMissing": {
+          "default": true,
+          "description": "Create the test file if it doesn't exist.",
+          "type": "boolean"
+        },
+        "goToTests.preferredSuffix": {
+          "default": ".test",
+          "description": "Preferred suffix for test files.",
+          "enum": [".test", ".spec", ""],
+          "type": "string"
+        },
+        "goToTests.targetFolderName": {
+          "default": "tests",
+          "description": "Folder name to navigate to when replacing 'src'. E.g., 'tests' or 'test'.",
+          "type": "string"
+        }
+      },
+      "title": "Go To Tests",
+      "type": "object"
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "goToTests.open",
+          "when": "true"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "goToTests.open",
+          "group": "navigation@2",
+          "when": "editorTextFocus && resourceExtname =~ /\\.(ts|tsx|js|jsx)$/"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "goToTests.open",
+          "group": "navigation@2",
+          "when": "resourceExtname =~ /\\.(ts|tsx|js|jsx)$/"
+        }
+      ]
+    }
+  },
+  "description": "Right-click to jump between source and matching test files by replacing a 'src' segment with a test folder.",
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.0",
+    "vsce": "^2.15.0"
+  },
+  "displayName": "Go To Tests",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./dist/extension.js",
+  "name": "go-to-tests",
+  "private": true,
+  "publisher": "noloco-local",
+  "scripts": {
+    "build": "tsc -p ./",
+    "package": "vsce package",
+    "vscode:prepublish": "npm run build",
+    "watch": "tsc -watch -p ./"
+  },
+  "version": "0.0.1"
+}
