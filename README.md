@@ -18,6 +18,7 @@ npm run package
 ```
 This produces a `.vsix` in this folder.
 
-
+To use this extension you'll need to go to 
+`Extensions: Install from VSIX...` and select the VSIX file
 
 
