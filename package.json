@@ -1,6 +1,10 @@
 {
-  "activationEvents": ["onCommand:goToTests.open"],
-  "categories": ["Other"],
+  "activationEvents": [
+    "onCommand:goToTests.open"
+  ],
+  "categories": [
+    "Other"
+  ],
   "contributes": {
     "commands": [
       {
@@ -19,7 +23,11 @@
         "goToTests.preferredSuffix": {
           "default": ".test",
           "description": "Preferred suffix for test files.",
-          "enum": [".test", ".spec", ""],
+          "enum": [
+            ".test",
+            ".spec",
+            ""
+          ],
           "type": "string"
         },
         "goToTests.targetFolderName": {
@@ -56,6 +64,7 @@
   },
   "description": "Right-click to jump between source and matching test files by replacing a 'src' segment with a test folder.",
   "devDependencies": {
+    "@types/node": "^24.10.0",
     "@types/vscode": "^1.85.0",
     "typescript": "^5.4.0",
     "vsce": "^2.15.0"
