@@ -1,6 +1,7 @@
 {
   "activationEvents": [
-    "onCommand:goToTests.open"
+    "onCommand:goToTests.open",
+    "onCommand:goToTests.openStory"
   ],
   "categories": [
     "Other"
@@ -11,6 +12,11 @@
         "category": "Navigation",
         "command": "goToTests.open",
         "title": "Go to Tests"
+      },
+      {
+        "category": "Navigation",
+        "command": "goToTests.openStory",
+        "title": "Go to Story"
       }
     ],
     "configuration": {
@@ -34,6 +40,11 @@
           "default": "tests",
           "description": "Folder name to navigate to when replacing 'src'. E.g., 'tests' or 'test'.",
           "type": "string"
+        },
+        "goToTests.createStoryIfMissing": {
+          "default": true,
+          "description": "Create the story file if it doesn't exist.",
+          "type": "boolean"
         }
       },
       "title": "Go To Tests",
@@ -44,6 +55,10 @@
         {
           "command": "goToTests.open",
           "when": "true"
+        },
+        {
+          "command": "goToTests.openStory",
+          "when": "true"
         }
       ],
       "editor/context": [
@@ -51,6 +66,11 @@
           "command": "goToTests.open",
           "group": "navigation@2",
           "when": "editorTextFocus && resourceExtname =~ /\\.(ts|tsx|js|jsx)$/"
+        },
+        {
+          "command": "goToTests.openStory",
+          "group": "navigation@3",
+          "when": "editorTextFocus && resourceExtname =~ /\\.(ts|tsx)$/"
         }
       ],
       "explorer/context": [
@@ -58,6 +78,11 @@
           "command": "goToTests.open",
           "group": "navigation@2",
           "when": "resourceExtname =~ /\\.(ts|tsx|js|jsx)$/"
+        },
+        {
+          "command": "goToTests.openStory",
+          "group": "navigation@3",
+          "when": "resourceExtname =~ /\\.(ts|tsx)$/"
         }
       ]
     }

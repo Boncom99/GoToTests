@@ -78,7 +78,71 @@ export function activate(context: vscode.ExtensionContext) {
     },
   );
 
-  context.subscriptions.push(goToTests);
+  const goToStory = vscode.commands.registerCommand(
+    'goToTests.openStory',
+    async (resource?: vscode.Uri) => {
+      const uri = resource ?? vscode.window.activeTextEditor?.document.uri;
+      if (!uri) {
+        vscode.window.showInformationMessage('No file selected');
+        return;
+      }
+      if (uri.scheme !== 'file') {
+        vscode.window.showInformationMessage('Resource must be a file on disk');
+        return;
+      }
+
+      const config = vscode.workspace.getConfiguration();
+      const createIfMissing = config.get<boolean>(
+        'goToTests.createStoryIfMissing',
+        true,
+      );
+
+      const filePath = uri.fsPath;
+      const candidates = computeStoryCandidatePaths(filePath);
+
+      const existing = await filterExistingUris(candidates);
+      let toOpen: vscode.Uri | undefined;
+
+      if (existing.length === 1) {
+        toOpen = existing[0];
+      } else if (existing.length > 1) {
+        const picked = await vscode.window.showQuickPick(
+          existing.map((uri) => ({
+            label: path.basename(uri.fsPath),
+            description: vscode.workspace.asRelativePath(uri),
+            uri,
+          })),
+          { title: 'Select file', placeHolder: 'Matching story file(s) found' },
+        );
+        toOpen = picked?.uri;
+      } else {
+        if (!createIfMissing) {
+          await vscode.window.showWarningMessage(
+            'No matching story file found and auto-create is disabled.',
+          );
+          return;
+        }
+        const newUri = candidates[0];
+        const newDir = vscode.Uri.file(path.dirname(newUri.fsPath));
+        try {
+          await vscode.workspace.fs.createDirectory(newDir);
+          await vscode.workspace.fs.writeFile(newUri, new Uint8Array());
+          toOpen = newUri;
+        } catch (err) {
+          vscode.window.showErrorMessage(
+            `Failed creating file: ${String(err)}`,
+          );
+          return;
+        }
+      }
+
+      if (toOpen) {
+        await vscode.window.showTextDocument(toOpen, { preview: false });
+      }
+    },
+  );
+
+  context.subscriptions.push(goToTests, goToStory);
 }
 
 function computeCandidatePaths(
@@ -130,6 +194,34 @@ function computeCandidatePaths(
       vscode.Uri.file(path.join(baseDir, `${testBaseName}${ext}`)),
     );
   }
+  return candidates;
+}
+
+function computeStoryCandidatePaths(sourceFileFsPath: string): vscode.Uri[] {
+  const ext = path.extname(sourceFileFsPath);
+  const fileName = path.basename(sourceFileFsPath, ext);
+  const dir = path.dirname(sourceFileFsPath);
+
+  // Check if we're currently in a story file
+  const isStoryFile = fileName.endsWith('.stories');
+
+  if (isStoryFile) {
+    // Going from story to source
+    const baseName = fileName.replace(/\.stories$/u, '');
+    const candidates = [
+      vscode.Uri.file(path.join(dir, `${baseName}${ext}`)),
+    ];
+    return candidates;
+  }
+
+  // Going from source to story
+  const candidates: vscode.Uri[] = [];
+
+  // Try .stories.tsx or .stories.ts in the same directory
+  candidates.push(
+    vscode.Uri.file(path.join(dir, `${fileName}.stories${ext}`)),
+  );
+
   return candidates;
 }
 
